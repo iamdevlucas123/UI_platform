@@ -34,7 +34,7 @@ executados e qualquer impedimento real. Não implemente itens de MVP2 ou Final.
 
 ---
 
-## 1. Estruturar o monorepo e as ferramentas
+## [done] 1. Estruturar o monorepo e as ferramentas
 
 ```text
 Partindo das regras permanentes, implemente apenas a fundação do monorepo do
@@ -59,7 +59,7 @@ Não implemente rotas, banco, Docker ou autenticação nesta etapa. Ao final,
 valide que pnpm install, pnpm lint e pnpm typecheck estão utilizáveis.
 ```
 
-## 2. Compartilhar contratos de validação
+## [done] 2. Compartilhar contratos de validação
 
 ```text
 Partindo das regras permanentes, implemente o pacote packages/shared conforme

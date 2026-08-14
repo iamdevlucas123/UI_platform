@@ -1,9 +1,9 @@
 /**
- * Ponto de entrada do pacote `@uilib/shared`.
- *
- * Nesta etapa (fundação do monorepo) o pacote existe apenas como esqueleto
- * instalável pelo `apps/api`. Os schemas Zod de `Component`, `Category` e
- * paginação (ver docs/MVP1.md, seção 4) serão adicionados em uma etapa
- * posterior de implementação do MVP1, junto com as rotas que os consomem.
+ * Ponto de entrada do pacote `@uilib/shared`: reexporta os schemas Zod de
+ * validação e os tipos compartilhados entre `apps/api` e, a partir do MVP2,
+ * `apps/web`.
  */
-export const SHARED_PACKAGE_NAME = '@uilib/shared';
+export * from './schemas/component.js';
+export * from './schemas/category.js';
+export * from './schemas/pagination.js';
+export * from './types.js';
