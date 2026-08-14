@@ -1,0 +1,16 @@
+// Schema Prisma — fundação do monorepo (MVP1, etapa 1).
+//
+// Apenas o boilerplate de generator/datasource está definido aqui para que
+// os scripts `prisma:generate`/`prisma:migrate` do package.json sejam
+// utilizáveis. A modelagem completa das entidades User, Category e Component
+// (ver docs/MVP1.md, seções 5 e 6) é adicionada em uma etapa posterior desta
+// implementação, junto com as migrations e o seed.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}

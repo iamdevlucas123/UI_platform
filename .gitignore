@@ -1,0 +1,27 @@
+# Dependências
+node_modules/
+
+# Builds
+dist/
+build/
+
+# Variáveis de ambiente (segredos nunca vão para o repositório)
+.env
+.env.*.local
+
+# Prisma (client gerado; migrations e schema permanecem versionados)
+apps/api/prisma/generated/
+
+# Testes e cobertura
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Editor / SO
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
