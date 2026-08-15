@@ -136,7 +136,7 @@ logs de segredos. Teste unitariamente os comportamentos que não requerem banco
 e execute lint/typecheck.
 ```
 
-## 5. Criar o módulo público de categorias e health check
+## [done] 5. Criar o módulo público de categorias e health check
 
 ```text
 Partindo das regras permanentes, implemente GET /api/health e GET
@@ -157,7 +157,7 @@ Adicione testes de integração de sucesso e erro para ambas as rotas. Não crie
 endpoints administrativos de categorias ainda.
 ```
 
-## 6. Criar os endpoints públicos de componentes
+## [done] 6. Criar os endpoints públicos de componentes
 
 ```text
 Partindo das regras permanentes, implemente o módulo components para as rotas
@@ -181,7 +181,7 @@ claras. Escreva testes de integração para DRAFT oculto, paginação, busca,
 categoria inexistente, slug inexistente e visualização de draft autorizada.
 ```
 
-## 7. Implementar o template e endpoint de prompt
+## [done] 7. Implementar o template e endpoint de prompt
 
 ```text
 Partindo das regras permanentes, implemente modules/prompts/default-template.ts
@@ -206,7 +206,7 @@ de testes de integração para defaults, escolhas válidas, query inválida e
 componente inexistente.
 ```
 
-## 8. Implementar auth provisória e administração de componentes
+## [done] 8. Implementar auth provisória e administração de componentes
 
 ```text
 Partindo das regras permanentes, implemente require-admin.ts e todos os

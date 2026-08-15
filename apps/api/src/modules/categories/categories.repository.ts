@@ -26,3 +26,13 @@ export function findAllOrderedByPosition() {
 export type CategoryWithPublishedCount = Awaited<
   ReturnType<typeof findAllOrderedByPosition>
 >[number];
+
+/**
+ * Só checa a existência da categoria pelo `id` — usado pelo service
+ * administrativo de componentes ao validar `categoryId` no create/update
+ * (seção 7 do MVP1: 422 se a categoria não existir).
+ */
+export async function existsById(id: string): Promise<boolean> {
+  const category = await prisma.category.findUnique({ where: { id }, select: { id: true } });
+  return category !== null;
+}

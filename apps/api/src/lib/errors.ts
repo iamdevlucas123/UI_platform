@@ -57,3 +57,14 @@ export class ForbiddenError extends AppError {
     super(403, 'FORBIDDEN', message);
   }
 }
+
+/**
+ * 422 — payload sintaticamente válido (passou no Zod) mas semanticamente
+ * inconsistente com o estado do banco (ex.: `categoryId` de uma categoria
+ * inexistente, seção 7 do MVP1).
+ */
+export class UnprocessableEntityError extends AppError {
+  constructor(message: string, details?: ApiErrorDetail[]) {
+    super(422, 'UNPROCESSABLE_ENTITY', message, details);
+  }
+}
