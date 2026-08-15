@@ -1,10 +1,7 @@
-// Schema Prisma — fundação do monorepo (MVP1, etapa 1).
-//
-// Apenas o boilerplate de generator/datasource está definido aqui para que
-// os scripts `prisma:generate`/`prisma:migrate` do package.json sejam
-// utilizáveis. A modelagem completa das entidades User, Category e Component
-// (ver docs/MVP1.md, seções 5 e 6) é adicionada em uma etapa posterior desta
-// implementação, junto com as migrations e o seed.
+// Schema Prisma (MVP1, seção 6) — modelagem completa de User, Category e
+// Component. Os índices GIN de busca por trigram (pg_trgm) não são
+// expressáveis neste schema pela versão do Prisma usada no MVP1; eles são
+// criados por uma migration SQL adicional (ver prisma/migrations).
 
 generator client {
   provider = "prisma-client-js"
@@ -13,4 +10,75 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+}
+
+enum ComponentStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  email     String   @unique
+  name      String?
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  components Component[]
+
+  @@map("users")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  components Component[]
+
+  @@index([position])
+  @@map("categories")
+}
+
+model Component {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String
+
+  // Código-fonte: é simultaneamente o que se copia e o que se renderiza
+  html String
+  css  String
+  js   String?
+
+  technologies String[] @default([])
+
+  /// Template específico deste componente. Nulo => usa o template global.
+  promptTemplate String?
+
+  status      ComponentStatus @default(DRAFT)
+  publishedAt DateTime?
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  authorId String?
+  author   User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId, status])
+  @@index([status, createdAt(sort: Desc)])
+  @@map("components")
 }

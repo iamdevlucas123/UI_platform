@@ -1,4 +1,9 @@
 {
   "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src"
+  },
+  // `seed.ts` roda via `tsx` a partir do .ts fonte; não faz parte do dist.
+  "include": ["src"],
   "exclude": ["src/**/*.test.ts"]
 }

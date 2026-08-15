@@ -2,8 +2,10 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "dist",
-    "rootDir": "src",
     "types": ["node"]
   },
-  "include": ["src"]
+  // Inclui "prisma" e os configs de teste na raiz para que também sejam
+  // verificados pelo `typecheck`, embora não façam parte do build de dist
+  // (ver tsconfig.build.json).
+  "include": ["src", "prisma", "vitest.config.ts", "vitest.setup.ts"]
 }

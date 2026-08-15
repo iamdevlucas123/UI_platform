@@ -85,7 +85,7 @@ DTOs ou campos que não aparecem em MVP1. Execute lint, typecheck e os testes
 do pacote.
 ```
 
-## 3. Modelar banco, migrations e seed
+## [done] 3. Modelar banco, migrations e seed
 
 ```text
 Partindo das regras permanentes, implemente a camada Prisma em apps/api.
@@ -108,7 +108,7 @@ e seed contra o banco de desenvolvimento se ele estiver disponível; se não
 estiver, valide estaticamente e deixe explícito o comando que depende do banco.
 ```
 
-## 4. Configuração, observabilidade e ciclo de vida da API
+## [done] 4. Configuração, observabilidade e ciclo de vida da API
 
 ```text
 Partindo das regras permanentes, construa a infraestrutura transversal da API
