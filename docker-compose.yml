@@ -1,0 +1,55 @@
+# Ambiente de desenvolvimento (MVP1, seção 11) — sobe banco + API com
+# `docker compose up`. O serviço `web` é adicionado neste arquivo no MVP2.
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: uilib_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: uilib
+      POSTGRES_PASSWORD: uilib
+      POSTGRES_DB: uilib
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U uilib -d uilib']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+      target: dev
+    container_name: uilib_api
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://uilib:uilib@db:5432/uilib?schema=public
+      PORT: '4000'
+      WEB_ORIGIN: http://localhost:3000
+    ports:
+      - '4000:4000'
+    volumes:
+      - ./apps/api:/app/apps/api
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/api/node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+    # `@uilib/shared` é consumido pelo `dist/` compilado, não pelo código-fonte
+    # — e o bind mount `./packages:/app/packages` sobrepõe qualquer `dist/`
+    # gerado durante o build da imagem, então precisa ser (re)compilado aqui
+    # para o `dev` funcionar com um único `docker compose up`. Migrations +
+    # seed rodam em seguida, automaticamente no start (idempotentes — seção 6
+    # do MVP1). `--filter @uilib/api` é necessário porque o binário do Prisma
+    # só existe em apps/api/node_modules/.bin — `pnpm prisma` na raiz do
+    # monorepo não resolveria o comando.
+    command: sh -c "pnpm --filter @uilib/shared build && pnpm --filter @uilib/api prisma:deploy && pnpm --filter @uilib/api prisma:seed && pnpm --filter @uilib/api dev"
+
+volumes:
+  pgdata:

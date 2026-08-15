@@ -233,7 +233,7 @@ Acrescente testes de integração para todos os endpoints administrativos e para
 soft delete, paginação ou filtros administrativos não descritos no MVP1.
 ```
 
-## 9. Implementar administração de categorias
+## [done] 9. Implementar administração de categorias
 
 ```text
 Partindo das regras permanentes, implemente POST, PUT e DELETE

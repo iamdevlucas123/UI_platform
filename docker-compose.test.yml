@@ -1,0 +1,24 @@
+# Banco de testes (MVP1, seção 13): segundo serviço Postgres, isolado do de
+# desenvolvimento (docker-compose.yml) por rodar numa porta própria (5433) e
+# não compartilhar volume — dados descartáveis, resetados via
+# `TRUNCATE ... RESTART IDENTITY CASCADE` entre casos, não via persistência.
+#
+# Uso: `docker compose -f docker-compose.test.yml up -d`, depois
+# `pnpm --filter @uilib/api test` (o script `pretest` roda `prisma migrate
+# deploy` contra essa porta antes da suíte).
+services:
+  db_test:
+    image: postgres:16-alpine
+    container_name: uilib_db_test
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: uilib
+      POSTGRES_PASSWORD: uilib
+      POSTGRES_DB: uilib_test
+    ports:
+      - '5433:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U uilib -d uilib_test']
+      interval: 5s
+      timeout: 5s
+      retries: 10

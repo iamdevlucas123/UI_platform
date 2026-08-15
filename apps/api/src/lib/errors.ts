@@ -1,6 +1,14 @@
 import type { ApiErrorDetail } from '@uilib/shared';
 
 /**
+ * Formato de `details` de um `AppError`: normalmente um array de campos
+ * inválidos (`ApiErrorDetail[]`), mas alguns erros de negócio do MVP1 usam
+ * um objeto específico — ex.: `CATEGORY_IN_USE` expõe `{ componentCount }`
+ * (seção 7), não um array de `{path, message}`.
+ */
+type ErrorDetails = ApiErrorDetail[] | Record<string, unknown>;
+
+/**
  * Erro base de domínio: toda falha esperada da aplicação estende esta
  * classe. O `error-handler` usa `statusCode`/`code`/`details` para montar o
  * envelope padronizado do MVP1 (seção 7); qualquer erro que não seja
@@ -12,7 +20,7 @@ export class AppError extends Error {
     public readonly statusCode: number,
     public readonly code: string,
     message: string,
-    public readonly details?: ApiErrorDetail[],
+    public readonly details?: ErrorDetails,
   ) {
     super(message);
     this.name = new.target.name;
@@ -39,7 +47,7 @@ export class NotFoundError extends AppError {
  * `CATEGORY_IN_USE` (seção 7) — além do genérico `CONFLICT`.
  */
 export class ConflictError extends AppError {
-  constructor(message: string, code = 'CONFLICT', details?: ApiErrorDetail[]) {
+  constructor(message: string, code = 'CONFLICT', details?: ErrorDetails) {
     super(409, code, message, details);
   }
 }

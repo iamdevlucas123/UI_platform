@@ -31,8 +31,7 @@ app.use(pinoHttp({ logger }));
 
 app.use('/api', apiRouter);
 
-// Qualquer rota não reconhecida (inclusive as de domínio, ainda não
-// implementadas nesta etapa) cai aqui em vez do HTML padrão do Express,
+// Qualquer rota não reconhecida cai aqui em vez do HTML padrão do Express,
 // mantendo o envelope de erro consistente em toda a API.
 app.use((req, _res, next) => {
   next(new NotFoundError(`Route ${req.method} ${req.originalUrl} not found`));

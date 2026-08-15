@@ -9,6 +9,7 @@
     "start": "node --env-file-if-exists=.env dist/server.js",
     "lint": "eslint .",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pretest": "DATABASE_URL=\"postgresql://uilib:uilib@localhost:5433/uilib_test?schema=public\" prisma migrate deploy",
     "test": "vitest run --passWithNoTests",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",

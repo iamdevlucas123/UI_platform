@@ -26,11 +26,16 @@ export interface ApiErrorDetail {
   message: string;
 }
 
-/** Envelope padronizado de erro (seção 7). */
+/**
+ * Envelope padronizado de erro (seção 7). `details` normalmente lista campos
+ * inválidos (erros de validação), mas alguns erros de negócio do MVP1 usam
+ * um objeto específico — ex.: `CATEGORY_IN_USE` expõe `details.componentCount`
+ * (seção 7) em vez do array de `{path, message}`.
+ */
 export interface ApiErrorResponse {
   error: {
     code: string;
     message: string;
-    details?: ApiErrorDetail[];
+    details?: ApiErrorDetail[] | Record<string, unknown>;
   };
 }

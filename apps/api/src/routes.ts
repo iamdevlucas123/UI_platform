@@ -3,7 +3,7 @@ import { Router, type Router as ExpressRouter, type RequestHandler } from 'expre
 import { NotFoundError } from './lib/errors.js';
 import { adminRateLimit, publicRateLimit } from './middlewares/rate-limit.js';
 import { requireAdmin } from './middlewares/require-admin.js';
-import { categoriesRouter } from './modules/categories/categories.routes.js';
+import { adminCategoriesRouter, categoriesRouter } from './modules/categories/categories.routes.js';
 import { adminComponentsRouter, componentsRouter } from './modules/components/components.routes.js';
 import { healthRouter } from './modules/health/health.routes.js';
 
@@ -13,10 +13,7 @@ const routeNotFound: RequestHandler = (req, _res, next) => {
 };
 
 /**
- * Agregador de rotas da API, montado em `/api` por `app.ts`. Endpoints
- * administrativos de categoria (`/api/admin/categories` — seção 7 do MVP1)
- * ainda não implementados serão registrados em `adminRouter.use(...)`
- * conforme forem implementados.
+ * Agregador de rotas da API, montado em `/api` por `app.ts`.
  *
  * `requireAdmin` (seção 9) é aplicado uma única vez aqui, para todo o
  * `adminRouter` — nenhum sub-router administrativo precisa repeti-lo.
@@ -35,6 +32,7 @@ const adminRouter: ExpressRouter = Router();
 adminRouter.use(adminRateLimit);
 adminRouter.use(requireAdmin);
 adminRouter.use(adminComponentsRouter);
+adminRouter.use(adminCategoriesRouter);
 adminRouter.use(routeNotFound);
 
 const publicRouter: ExpressRouter = Router();
