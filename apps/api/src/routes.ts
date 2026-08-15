@@ -2,6 +2,8 @@ import { Router, type Router as ExpressRouter, type RequestHandler } from 'expre
 
 import { NotFoundError } from './lib/errors.js';
 import { adminRateLimit, publicRateLimit } from './middlewares/rate-limit.js';
+import { categoriesRouter } from './modules/categories/categories.routes.js';
+import { healthRouter } from './modules/health/health.routes.js';
 
 /** Encaminha ao error-handler um 404 no formato do envelope padrão (seção 7). */
 const routeNotFound: RequestHandler = (req, _res, next) => {
@@ -9,11 +11,10 @@ const routeNotFound: RequestHandler = (req, _res, next) => {
 };
 
 /**
- * Agregador de rotas da API, montado em `/api` por `app.ts`. Nesta etapa
- * não há módulos de domínio ainda (`modules/components`, `modules/categories`,
- * `modules/prompts`, `modules/health` — seção 4 do MVP1): cada um será
- * registrado abaixo, via `adminRouter.use(...)` ou `publicRouter.use(...)`,
- * conforme for implementado.
+ * Agregador de rotas da API, montado em `/api` por `app.ts`. Módulos ainda
+ * não implementados (`modules/components`, `modules/prompts` — seção 4 do
+ * MVP1) serão registrados abaixo, via `adminRouter.use(...)` ou
+ * `publicRouter.use(...)`, conforme forem implementados.
  *
  * A separação entre `adminRouter` e `publicRouter` já existe porque o rate
  * limit difere por prefixo (seção 10 do MVP1: 120 req/min público, 30
@@ -31,6 +32,8 @@ adminRouter.use(routeNotFound);
 
 const publicRouter: ExpressRouter = Router();
 publicRouter.use(publicRateLimit);
+publicRouter.use(healthRouter);
+publicRouter.use(categoriesRouter);
 publicRouter.use(routeNotFound);
 
 router.use('/admin', adminRouter);
