@@ -167,7 +167,7 @@ export async function renderComponentPrompt(
  * `PUBLISHED → DRAFT` nunca passa por aqui com `current` nulo, então a data
  * original é sempre mantida.
  */
-function resolvePublishedAt(
+export function resolvePublishedAt(
   current: Date | null,
   nextStatus: AdminComponentRow['status'],
 ): Date | null {
