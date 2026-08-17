@@ -7,7 +7,7 @@ import {
   NotFoundError,
   UnauthorizedError,
   ValidationError,
-} from './errors.js';
+} from '../errors.js';
 
 describe('AppError', () => {
   it('é uma instância de Error com statusCode/code/message/details', () => {

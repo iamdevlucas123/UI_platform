@@ -3,9 +3,9 @@ import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 
-import { errorHandler } from './error-handler.js';
-import { requestId } from './request-id.js';
-import { validate } from './validate.js';
+import { errorHandler } from '../error-handler.js';
+import { requestId } from '../request-id.js';
+import { validate } from '../validate.js';
 
 const bodySchema = z.object({
   name: z.string().min(2),

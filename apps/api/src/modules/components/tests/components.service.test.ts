@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { resolvePublishedAt } from './components.service.js';
+import { resolvePublishedAt } from '../components.service.js';
 
 describe('resolvePublishedAt', () => {
   it('define a data ao transicionar de DRAFT (nula) para PUBLISHED', () => {

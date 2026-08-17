@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { createCategorySchema, updateCategorySchema } from './category.js';
+import { createCategorySchema, updateCategorySchema } from '../category.js';
 
 describe('createCategorySchema', () => {
   it('aceita apenas o name e aplica position = 0 por default', () => {

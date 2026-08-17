@@ -2,7 +2,7 @@ import express from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
-import { createRateLimiter } from './rate-limit.js';
+import { createRateLimiter } from '../rate-limit.js';
 
 function buildApp(limit: number) {
   const app = express();

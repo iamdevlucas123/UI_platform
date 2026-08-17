@@ -4,7 +4,7 @@ import {
   componentPromptQuerySchema,
   createComponentSchema,
   updateComponentSchema,
-} from './component.js';
+} from '../component.js';
 
 /** Payload mínimo válido para criação, usado como base nos testes. */
 const validPayload = {

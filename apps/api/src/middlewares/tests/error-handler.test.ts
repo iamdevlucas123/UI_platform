@@ -2,9 +2,9 @@ import express from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
-import { ValidationError } from '../lib/errors.js';
-import { errorHandler } from './error-handler.js';
-import { requestId } from './request-id.js';
+import { ValidationError } from '../../lib/errors.js';
+import { errorHandler } from '../error-handler.js';
+import { requestId } from '../request-id.js';
 
 function buildApp() {
   const app = express();

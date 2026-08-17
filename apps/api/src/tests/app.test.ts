@@ -1,8 +1,8 @@
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
-import { app } from './app.js';
-import { env } from './config/env.js';
+import { app } from '../app.js';
+import { env } from '../config/env.js';
 
 describe('app', () => {
   it('devolve o envelope de erro padronizado em rota inexistente, sem stack trace', async () => {

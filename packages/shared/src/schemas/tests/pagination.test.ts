@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { listComponentsQuerySchema } from './pagination.js';
+import { listComponentsQuerySchema } from '../pagination.js';
 
 describe('listComponentsQuerySchema', () => {
   it('aplica os defaults quando todos os params são omitidos', () => {

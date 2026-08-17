@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { renderPrompt, type RenderPromptInput } from './prompt.service.js';
+import { renderPrompt, type RenderPromptInput } from '../prompt.service.js';
 
 const baseInput: RenderPromptInput = {
   name: 'Neon Toggle Switch',

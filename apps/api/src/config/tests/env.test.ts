@@ -30,7 +30,7 @@ describe('config/env', () => {
     process.env.LOG_LEVEL = 'warn';
     process.env.DEV_ADMIN_TOKEN = 'dev-token';
 
-    const { env } = await import('./env.js');
+    const { env } = await import('../env.js');
 
     expect(env).toEqual({
       NODE_ENV: 'test',
@@ -50,7 +50,7 @@ describe('config/env', () => {
     delete process.env.PORT;
     delete process.env.LOG_LEVEL;
 
-    const { env } = await import('./env.js');
+    const { env } = await import('../env.js');
 
     expect(env.PORT).toBe(4000);
     expect(env.LOG_LEVEL).toBe('info');
@@ -62,7 +62,7 @@ describe('config/env', () => {
     process.env.WEB_ORIGIN = 'http://localhost:3000';
     delete process.env.DEV_ADMIN_TOKEN;
 
-    await expect(import('./env.js')).rejects.toThrow('Invalid environment variables');
+    await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
   });
 
   it('falha ao iniciar se DATABASE_URL não for uma URL válida', async () => {
@@ -71,7 +71,7 @@ describe('config/env', () => {
     process.env.WEB_ORIGIN = 'http://localhost:3000';
     process.env.DEV_ADMIN_TOKEN = 'dev-token';
 
-    await expect(import('./env.js')).rejects.toThrow('Invalid environment variables');
+    await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
   });
 
   it('falha ao iniciar se NODE_ENV estiver fora do enum', async () => {
@@ -80,6 +80,6 @@ describe('config/env', () => {
     process.env.WEB_ORIGIN = 'http://localhost:3000';
     process.env.DEV_ADMIN_TOKEN = 'dev-token';
 
-    await expect(import('./env.js')).rejects.toThrow('Invalid environment variables');
+    await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
   });
 });

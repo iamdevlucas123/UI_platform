@@ -2,7 +2,7 @@ import express from 'express';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
-import { requestId } from './request-id.js';
+import { requestId } from '../request-id.js';
 
 function buildApp() {
   const app = express();
