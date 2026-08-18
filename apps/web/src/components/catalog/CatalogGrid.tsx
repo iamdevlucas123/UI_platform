@@ -15,6 +15,8 @@ export interface CatalogGridProps {
   error: boolean;
   currentSearchParams: URLSearchParams;
   hasActiveFilters: boolean;
+  /** Rota-base repassada à paginação e ao "limpar filtros" (seção 7 do MVP2: reaproveitada por `/category/[slug]`). Default: home. */
+  pathname?: string;
 }
 
 interface GoodResult {
@@ -34,7 +36,14 @@ interface GoodResult {
  * (mantém `lastGood` na tela + banner discreto) — sem essa memória local,
  * uma falha transitória de refetch apagaria o conteúdo já em cache.
  */
-export function CatalogGrid({ data, meta, error, currentSearchParams, hasActiveFilters }: CatalogGridProps) {
+export function CatalogGrid({
+  data,
+  meta,
+  error,
+  currentSearchParams,
+  hasActiveFilters,
+  pathname = '/',
+}: CatalogGridProps) {
   const [lastGood, setLastGood] = useState<GoodResult | null>(data && meta ? { data, meta } : null);
 
   useEffect(() => {
@@ -60,11 +69,11 @@ export function CatalogGrid({ data, meta, error, currentSearchParams, hasActiveF
         </p>
       )}
       {display.data.length === 0 ? (
-        <EmptyState hasActiveFilters={hasActiveFilters} />
+        <EmptyState hasActiveFilters={hasActiveFilters} clearHref={pathname} />
       ) : (
         <Grid items={display.data} />
       )}
-      <Pagination meta={display.meta} currentSearchParams={currentSearchParams} />
+      <Pagination meta={display.meta} currentSearchParams={currentSearchParams} pathname={pathname} />
     </div>
   );
 }

@@ -81,3 +81,13 @@ export function SearchBar() {
     </div>
   );
 }
+
+/** Fallback do `<Suspense>` em torno de `<SearchBar>` — reaproveitado por toda rota que reusa a busca (home, `/category/[slug]`). */
+export function SearchBarSkeleton() {
+  return (
+    <div
+      aria-hidden="true"
+      className="h-9 w-full animate-pulse rounded-full bg-neutral-100 sm:max-w-xs"
+    />
+  );
+}

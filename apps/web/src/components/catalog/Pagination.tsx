@@ -8,10 +8,12 @@ import { buildCatalogHref } from '@/lib/catalog-url';
 export interface PaginationProps {
   meta: PaginationMeta;
   currentSearchParams: URLSearchParams;
+  /** Rota-base dos links de página (seção 7 do MVP2: reaproveitada por `/category/[slug]`). Default: home. */
+  pathname?: string;
 }
 
 /** Paginação (seção 5.1 do MVP2), estado refletido em `?page=`. */
-export function Pagination({ meta, currentSearchParams }: PaginationProps) {
+export function Pagination({ meta, currentSearchParams, pathname = '/' }: PaginationProps) {
   if (meta.totalPages <= 1) {
     return null;
   }
@@ -23,7 +25,7 @@ export function Pagination({ meta, currentSearchParams }: PaginationProps) {
     <nav aria-label="Pagination" className="flex items-center justify-center gap-6 pt-2 text-sm">
       <PagerLink
         disabled={!hasPrev}
-        href={buildCatalogHref('/', currentSearchParams, { page: meta.page - 1 })}
+        href={buildCatalogHref(pathname, currentSearchParams, { page: meta.page - 1 })}
         label="Previous page"
       >
         <ChevronLeft className="h-4 w-4" aria-hidden="true" />
@@ -34,7 +36,7 @@ export function Pagination({ meta, currentSearchParams }: PaginationProps) {
       </span>
       <PagerLink
         disabled={!hasNext}
-        href={buildCatalogHref('/', currentSearchParams, { page: meta.page + 1 })}
+        href={buildCatalogHref(pathname, currentSearchParams, { page: meta.page + 1 })}
         label="Next page"
       >
         Next

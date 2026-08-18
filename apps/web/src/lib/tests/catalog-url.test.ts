@@ -78,4 +78,29 @@ describe('buildCatalogHref', () => {
     expect(buildCatalogHref('/', current, { q: undefined })).toBe('/?category=buttons');
     expect(buildCatalogHref('/', current, { category: '' })).toBe('/?q=neon');
   });
+
+  // `/category/[slug]` (seção 7 do MVP2) reaproveita esta mesma função com
+  // `pathname` diferente de '/' — Pagination/SortToggle/CategoryNav passam
+  // a rota da categoria em vez da home.
+  describe('reaproveitada por /category/[slug] com um pathname diferente de "/"', () => {
+    it('monta o href sob a rota da categoria em vez de "/"', () => {
+      expect(buildCatalogHref('/category/buttons', new URLSearchParams(), { page: 2 })).toBe(
+        '/category/buttons?page=2',
+      );
+    });
+
+    it('preserva q/sort ao trocar de página dentro da categoria', () => {
+      const current = new URLSearchParams('q=neon&sort=name&page=2');
+      expect(buildCatalogHref('/category/buttons', current, { page: 3 })).toBe(
+        '/category/buttons?q=neon&sort=name&page=3',
+      );
+    });
+
+    it('remove "category" da querystring — a categoria já está no path, não deve duplicar como filtro', () => {
+      const current = new URLSearchParams('category=buttons&sort=name');
+      expect(buildCatalogHref('/category/buttons', current, { category: undefined })).toBe(
+        '/category/buttons?sort=name',
+      );
+    });
+  });
 });

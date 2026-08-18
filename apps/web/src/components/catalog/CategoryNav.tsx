@@ -10,7 +10,12 @@ export interface CategoryNavProps {
   activeCategory?: string;
 }
 
-/** Filtro por categoria via `?category=` (seção 5.1 do MVP2). */
+/**
+ * Filtro por categoria (seção 5.1 do MVP2): cada categoria navega para sua
+ * rota dedicada `/category/[slug]` (seção 7), não `/?category=`. `q`/`sort`
+ * atuais são preservados na troca via `buildCatalogHref`; `category` some
+ * das query params porque passa a viver no path.
+ */
 export function CategoryNav({ categories, currentSearchParams, activeCategory }: CategoryNavProps) {
   return (
     <nav aria-label="Filter by category" className="flex flex-wrap gap-2">
@@ -23,7 +28,9 @@ export function CategoryNav({ categories, currentSearchParams, activeCategory }:
       {categories.map((category) => (
         <CategoryPill
           key={category.id}
-          href={buildCatalogHref('/', currentSearchParams, { category: category.slug })}
+          href={buildCatalogHref(`/category/${category.slug}`, currentSearchParams, {
+            category: undefined,
+          })}
           isActive={activeCategory === category.slug}
         >
           {category.name}

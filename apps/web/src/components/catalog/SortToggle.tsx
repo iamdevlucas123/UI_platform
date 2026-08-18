@@ -6,6 +6,8 @@ import { buildCatalogHref } from '@/lib/catalog-url';
 export interface SortToggleProps {
   sort: ComponentSort;
   currentSearchParams: URLSearchParams;
+  /** Rota-base dos links de ordenação (seção 7 do MVP2: reaproveitada por `/category/[slug]`). Default: home. */
+  pathname?: string;
 }
 
 const OPTIONS: Array<{ value: ComponentSort; label: string }> = [
@@ -14,7 +16,7 @@ const OPTIONS: Array<{ value: ComponentSort; label: string }> = [
 ];
 
 /** Ordenação (seção 5.1 do MVP2): mais recentes (padrão) e alfabética. */
-export function SortToggle({ sort, currentSearchParams }: SortToggleProps) {
+export function SortToggle({ sort, currentSearchParams, pathname = '/' }: SortToggleProps) {
   return (
     <div
       role="group"
@@ -26,7 +28,7 @@ export function SortToggle({ sort, currentSearchParams }: SortToggleProps) {
         return (
           <Link
             key={option.value}
-            href={buildCatalogHref('/', currentSearchParams, { sort: option.value })}
+            href={buildCatalogHref(pathname, currentSearchParams, { sort: option.value })}
             aria-current={isActive ? 'true' : undefined}
             className={[
               'rounded-full px-3 py-1 transition-colors',
