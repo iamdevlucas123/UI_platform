@@ -244,15 +244,23 @@ export const serverApi = {
     });
   },
 
+  /**
+   * `GET /api/components/:slug` (seção 4/7 do MVP2). `token` é opcional e só
+   * deve ser passado quando `preview` também é `true` — o chamador (página
+   * de detalhe) já garante isso ao só resolver um token quando a sessão tem
+   * `role: 'admin'` (seção 9); `preview=1` sem token válido equivale a uma
+   * consulta pública (a API decide isso, este cliente só repassa os dois).
+   */
   getComponent(
     slug: string,
-    options?: { preview?: boolean },
+    options?: { preview?: boolean; token?: string },
     next?: NextFetchOptions,
   ): Promise<ApiItemResponse<ComponentDetailDto>> {
     return request({
       baseUrl: env.INTERNAL_API_URL,
       path: `/api/components/${encodeURIComponent(slug)}`,
       query: { preview: options?.preview ? '1' : undefined },
+      token: options?.token,
       next,
     });
   },
