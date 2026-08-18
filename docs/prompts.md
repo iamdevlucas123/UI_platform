@@ -19,7 +19,7 @@ como contexto do agente):
 > alterados, validações executadas e pendências reais. Não use
 > `dangerouslySetInnerHTML` para renderizar código de componentes.
 
-## 01 — Diagnóstico e fundação do app web
+## [done] 01 — Diagnóstico e fundação do app web
 
 > Aplique o briefing comum. Primeiro, faça uma leitura do repositório e compare
 > o estado atual com as seções 3, 7, 10 e 13 de `docs/MVP2.md`. Em seguida,
@@ -45,7 +45,7 @@ como contexto do agente):
 > validando que o workspace web compila e que os comandos raiz continuam
 > funcionando.
 
-## 02 — Cliente HTTP tipado e contratos de UI
+## [done] 02 — Cliente HTTP tipado e contratos de UI
 
 > Aplique o briefing comum. Implemente a camada única de comunicação do web com
 > a API em `apps/web/src/lib/api-client.ts` e os tipos auxiliares estritamente
@@ -69,7 +69,7 @@ como contexto do agente):
 > queries e parsing de envelopes/erros, incluindo casos inválidos. Não construa
 > páginas nesta tarefa.
 
-## 03 — Preview isolado em iframe (protótipo obrigatório)
+## [done] 03 — Preview isolado em iframe (protótipo obrigatório)
 
 > Aplique o briefing comum. Prototipe e entregue primeiro a infraestrutura de
 > preview da seção 8, isolada das páginas de catálogo. Crie
@@ -95,7 +95,7 @@ como contexto do agente):
 > configuração segura do iframe. Verifique visualmente a rota em viewport
 > desktop e mobile antes de seguir para o catálogo.
 
-## 04 — Catálogo público: home, busca, filtros e paginação
+## [done] 04 — Catálogo público: home, busca, filtros e paginação
 
 > Aplique o briefing comum. Implemente a biblioteca pública descrita na seção
 > 5.1 usando a infraestrutura de preview já entregue. Crie os componentes de

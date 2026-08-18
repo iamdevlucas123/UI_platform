@@ -10,7 +10,7 @@ banco de dados, Docker e autenticação ainda **não** existem.
 ```
 apps/
   api/       # Express — API backend (esqueleto nesta etapa)
-  web/       # Next.js — placeholder, populado no MVP2
+  web/       # Next.js 15 (App Router) — esqueleto do MVP2, ver apps/web/README.md
 packages/
   shared/    # schemas Zod e tipos compartilhados (esqueleto nesta etapa)
 ```
@@ -60,7 +60,7 @@ HTTP, rotas ou conexão com banco de dados.
 pnpm test
 ```
 
-Roda a suíte Vitest de todos os workspaces (`apps/api` e `packages/shared`).
+Roda a suíte Vitest de todos os workspaces (`apps/api`, `apps/web` e `packages/shared`).
 
 ## Outros comandos úteis
 

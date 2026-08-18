@@ -19,6 +19,8 @@ export const slugSchema = z
 /** Status de publicação de um componente (Prisma `ComponentStatus`, seção 6). */
 export const componentStatusSchema = z.enum(['DRAFT', 'PUBLISHED']);
 
+export type ComponentStatus = z.infer<typeof componentStatusSchema>;
+
 /** Frameworks de destino aceitos pelo gerador de prompt (seção 7). */
 export const promptFrameworkSchema = z.enum(['react', 'vue', 'svelte', 'angular', 'html']);
 

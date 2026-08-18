@@ -5,6 +5,8 @@ import { slugSchema } from './component.js';
 /** Critério de ordenação da listagem pública de componentes (seção 7). */
 export const componentSortSchema = z.enum(['recent', 'name']);
 
+export type ComponentSort = z.infer<typeof componentSortSchema>;
+
 /**
  * `GET /api/components` — query pública de listagem/pesquisa (seção 7).
  * `limit` tem teto 48: a listagem inclui o preview (`html`/`css`/`js`) de

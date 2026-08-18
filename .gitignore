@@ -27,3 +27,6 @@ pnpm-debug.log*
 .idea/
 
 /docs
+prompts.md
+note.txt
+MVP1.md
