@@ -8,7 +8,11 @@ import { notFound } from 'next/navigation';
 import { CodeTabs } from '@/components/code/CodeTabs';
 import { CopyCodeButton } from '@/components/code/CopyCodeButton';
 import { ComponentPreviewPanel } from '@/components/preview/ComponentPreviewPanel';
+import { PromptPanel } from '@/components/prompt/PromptPanel';
 import { ApiError, serverApi } from '@/lib/api-client';
+import { fetchAllPublishedComponents } from '@/lib/catalog-data';
+import { publicEnv } from '@/lib/env';
+import { serializeJsonLd } from '@/lib/json-ld';
 
 interface ComponentPageProps {
   params: Promise<{ slug: string }>;
@@ -20,8 +24,10 @@ interface ComponentPageProps {
  * categoria (link), descrição em texto puro, tecnologias, preview funcional
  * amplo com alternância clara/escura (`ComponentPreviewPanel`, que reaproveita
  * `SandboxPreview`/`ThemeToggle` da seção 8), código em abas (`CodeTabs`,
- * highlight no servidor) e "Copy Code" (`CopyCodeButton`). "Copy AI Prompt"
- * e o seletor de stack ficam fora desta tarefa (sem integração com LLM).
+ * highlight no servidor) e "Copy Code" (`CopyCodeButton`). `PromptPanel`
+ * cobre "Copy AI Prompt" + o seletor de stack (seção 5.3): o prompt inicial
+ * é só o campo `prompt` já vindo de `GET /:slug` abaixo — nenhuma chamada a
+ * LLM acontece nesta página nem em `PromptPanel`/`StackSelector`.
  *
  * De propósito, esta pasta não tem `loading.tsx` — mesmo motivo documentado
  * em `app/category/[slug]/page.tsx`: qualquer `<Suspense>` acima do
@@ -29,27 +35,10 @@ interface ComponentPageProps {
  * assíncrono resolver.
  */
 
-const COMPONENTS_LIST_PAGE_SIZE = 48;
-
-/** Pré-renderiza os slugs conhecidos (seção 7 do MVP2). `getComponents` só retorna `PUBLISHED` (seção 7 do MVP1) — um DRAFT nunca entra aqui. */
+/** Pré-renderiza os slugs conhecidos (seção 7 do MVP2). `fetchAllPublishedComponents` só devolve `PUBLISHED` — um DRAFT nunca entra aqui. */
 export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
-  const slugs: string[] = [];
-  let page = 1;
-
-  for (;;) {
-    const response = await serverApi.getComponents(
-      { page, limit: COMPONENTS_LIST_PAGE_SIZE },
-      { revalidate: 300, tags: ['components'] },
-    );
-    slugs.push(...response.data.map((item) => item.slug));
-
-    if (response.data.length === 0 || page >= response.meta.totalPages) {
-      break;
-    }
-    page += 1;
-  }
-
-  return slugs.map((slug) => ({ slug }));
+  const components = await fetchAllPublishedComponents({ revalidate: 300, tags: ['components'] });
+  return components.map((component) => ({ slug: component.slug }));
 }
 
 function toSingleValue(value: string | string[] | undefined): string | undefined {
@@ -124,15 +113,53 @@ export async function generateMetadata({ params, searchParams }: ComponentPagePr
       };
     }
 
+    const title = `${component.name} — UI Library`;
+    const url = `${publicEnv.NEXT_PUBLIC_SITE_URL}/component/${component.slug}`;
+
     return {
-      title: `${component.name} — UI Library`,
+      title,
       description: component.description,
+      alternates: { canonical: url },
+      // `openGraph.images` não é setado aqui de propósito: o arquivo
+      // `opengraph-image.tsx` desta mesma pasta já injeta a tag `og:image`
+      // automaticamente (seção 7 do MVP2) — repetir a URL à mão arriscaria
+      // divergir da rota real que o Next.js gera.
+      openGraph: {
+        type: 'article',
+        title,
+        description: component.description,
+        url,
+        publishedTime: component.createdAt,
+        tags: component.technologies,
+      },
     };
   } catch {
     // Slug inexistente (ou falha inesperada): metadata vazia — a página em
     // si resolve notFound()/o erro correspondente.
     return {};
   }
+}
+
+/**
+ * Dados estruturados do componente (seção 5.2 do MVP2) — `SoftwareSourceCode`
+ * (schema.org): é literalmente o que a página oferece, código-fonte
+ * catalogado. Só campos públicos (mesmos de `generateMetadata`); nunca
+ * chamado no ramo de preview (ver uso abaixo).
+ */
+function buildComponentJsonLd(component: ComponentDetailDto): Record<string, unknown> {
+  const url = `${publicEnv.NEXT_PUBLIC_SITE_URL}/component/${component.slug}`;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareSourceCode',
+    name: component.name,
+    description: component.description,
+    url,
+    image: `${url}/opengraph-image`,
+    programmingLanguage: component.technologies,
+    about: { '@type': 'Thing', name: component.category.name },
+    datePublished: component.createdAt,
+  };
 }
 
 export default async function ComponentPage({ params, searchParams }: ComponentPageProps) {
@@ -157,6 +184,15 @@ export default async function ComponentPage({ params, searchParams }: ComponentP
 
   return (
     <main className="mx-auto flex max-w-5xl flex-col gap-6 p-4 sm:p-8">
+      {/* JSON-LD (seção 5.2 do MVP2): nunca no ramo de preview — um DRAFT em
+          revisão não deve declarar dados estruturados públicos. Serializado
+          com segurança via `serializeJsonLd` (escapa `</script`), nunca
+          `dangerouslySetInnerHTML`: o filho do `<script>` é texto comum do
+          React, tratado pelo navegador como dado, não como HTML. */}
+      {!isPreview && (
+        <script type="application/ld+json">{serializeJsonLd(buildComponentJsonLd(component))}</script>
+      )}
+
       <Link
         href="/"
         className="flex w-fit items-center gap-1 text-sm text-neutral-500 hover:text-neutral-800 hover:underline"
@@ -210,6 +246,8 @@ export default async function ComponentPage({ params, searchParams }: ComponentP
           <CodeTabs html={component.html} css={component.css} js={component.js} />
         </div>
       </section>
+
+      <PromptPanel slug={component.slug} initialPrompt={component.prompt} />
     </main>
   );
 }

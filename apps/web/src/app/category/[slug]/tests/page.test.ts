@@ -73,6 +73,20 @@ describe('generateMetadata (SEO específico por categoria)', () => {
 
     expect(metadata).toEqual({});
   });
+
+  it('inclui Open Graph e canonical (seção 5.2 do MVP2)', async () => {
+    getCategories.mockResolvedValue({ data: [makeCategory()] });
+
+    const metadata = await generateMetadata({ params: Promise.resolve({ slug: 'buttons' }) });
+
+    expect(metadata.openGraph).toMatchObject({
+      type: 'website',
+      title: 'Buttons — UI Library',
+      description: 'Clickable buttons of every shape.',
+      url: 'http://localhost:3000/category/buttons',
+    });
+    expect(metadata.alternates).toEqual({ canonical: 'http://localhost:3000/category/buttons' });
+  });
 });
 
 describe('CategoryPage — caso 404 (seção 7 do MVP2)', () => {

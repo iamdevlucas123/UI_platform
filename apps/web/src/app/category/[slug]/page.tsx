@@ -11,6 +11,7 @@ import { SearchBar, SearchBarSkeleton } from '@/components/catalog/SearchBar';
 import { SortToggle } from '@/components/catalog/SortToggle';
 import { ApiError, serverApi } from '@/lib/api-client';
 import { parseCatalogQuery, toURLSearchParams } from '@/lib/catalog-url';
+import { publicEnv } from '@/lib/env';
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -61,11 +62,22 @@ export async function generateMetadata({
     return {};
   }
 
+  const title = `${category.name} — UI Library`;
+  const description =
+    category.description?.trim() ||
+    `Browse ${category.name} components: preview them live and copy the code or an AI prompt.`;
+  const url = `${publicEnv.NEXT_PUBLIC_SITE_URL}/category/${category.slug}`;
+
   return {
-    title: `${category.name} — UI Library`,
-    description:
-      category.description?.trim() ||
-      `Browse ${category.name} components: preview them live and copy the code or an AI prompt.`,
+    title,
+    description,
+    alternates: { canonical: url },
+    // `openGraph.images` não é setado à mão: `opengraph-image.tsx` (mesma
+    // pasta) já injeta a tag `og:image` automaticamente — confirmado que
+    // este arquivo é necessário porque a convenção NÃO cascateia de
+    // `app/opengraph-image.tsx` (raiz) para segmentos filhos como
+    // `loading.tsx`/`error.tsx` cascateiam.
+    openGraph: { type: 'website', title, description, url },
   };
 }
 

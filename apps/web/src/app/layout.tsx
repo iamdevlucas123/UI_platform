@@ -6,10 +6,29 @@ import { publicEnv } from '@/lib/env';
 
 import './globals.css';
 
+const SITE_DESCRIPTION = 'Biblioteca web pública de componentes de interface.';
+
+/**
+ * Metadata raiz (seção 5.2/7 do MVP2): serve como default para toda rota
+ * sem `generateMetadata` própria — hoje, efetivamente só `/` (`app/(home)/
+ * page.tsx` não define a sua). `openGraph.images` fica de fora de propósito:
+ * `app/opengraph-image.tsx` (mesma pasta) já injeta a tag `og:image` para
+ * `/`. Confirmado manualmente que essa convenção NÃO cascateia para
+ * segmentos filhos como `loading.tsx`/`error.tsx` cascateiam — por isso
+ * `/category/[slug]` e `/component/[slug]` têm cada um o seu próprio
+ * `opengraph-image.tsx`, em vez de herdar este.
+ */
 export const metadata: Metadata = {
   metadataBase: new URL(publicEnv.NEXT_PUBLIC_SITE_URL),
   title: 'UI Library',
-  description: 'Biblioteca web pública de componentes de interface.',
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    type: 'website',
+    siteName: 'UI Library',
+    title: 'UI Library',
+    description: SITE_DESCRIPTION,
+    url: publicEnv.NEXT_PUBLIC_SITE_URL,
+  },
 };
 
 /**
