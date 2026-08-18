@@ -4,6 +4,7 @@ node_modules/
 # Builds
 dist/
 build/
+.next/
 
 # Variáveis de ambiente (segredos nunca vão para o repositório)
 .env
