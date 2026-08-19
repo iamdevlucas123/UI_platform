@@ -15,6 +15,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().default(4000),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
   CLERK_SECRET_KEY: z.string().min(1).startsWith('sk_'),
+  REVALIDATE_SECRET: z.string().min(1),
 });
 
 const parsed = envSchema.safeParse(process.env);

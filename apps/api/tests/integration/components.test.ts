@@ -17,6 +17,14 @@ vi.mock('@clerk/backend', async () => ({
 }));
 
 /**
+ * Mocka `revalidate()` (chamada por create/update/delete, seção 7 do MVP2)
+ * para não depender de um servidor Next.js real escutando durante os
+ * testes — o comportamento de `revalidate()` em si é coberto isoladamente
+ * em `src/lib/tests/revalidate.test.ts`.
+ */
+vi.mock('../../src/lib/revalidate.js', () => ({ revalidate: vi.fn().mockResolvedValue(undefined) }));
+
+/**
  * Testes de integração de `GET /api/components` e `GET /api/components/:slug`
  * (seção 7 e 13 do MVP1). Requerem um Postgres real acessível via
  * `DATABASE_URL`, com as migrations aplicadas. `TRUNCATE ... RESTART

@@ -1,5 +1,6 @@
 import {
   componentPromptQuerySchema,
+  slugify,
   type CreateComponentInput,
   type ListComponentsQuery,
   type PaginationMeta,
@@ -8,7 +9,7 @@ import {
 
 import { env } from '../../config/env.js';
 import { ConflictError, NotFoundError, UnprocessableEntityError } from '../../lib/errors.js';
-import { slugify } from '../../lib/slug.js';
+import { revalidate } from '../../lib/revalidate.js';
 import { existsById as categoryExistsById } from '../categories/categories.repository.js';
 import type { AuthContext } from '../../types/express.js';
 import { renderPrompt, type RenderPromptInput } from '../prompts/prompt.service.js';
@@ -230,6 +231,8 @@ export async function createComponent(
     publishedAt,
   });
 
+  await revalidate();
+
   return toAdminComponentDto(row);
 }
 
@@ -281,6 +284,8 @@ export async function updateComponent(
     publishedAt,
   });
 
+  await revalidate();
+
   return toAdminComponentDto(row);
 }
 
@@ -290,4 +295,6 @@ export async function deleteComponent(id: string): Promise<void> {
   if (!deleted) {
     throw new NotFoundError(`Component "${id}" not found`);
   }
+
+  await revalidate();
 }

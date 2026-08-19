@@ -22,13 +22,14 @@ describe('config/env', () => {
     vi.restoreAllMocks();
   });
 
-  it('faz parse das seis variáveis válidas, incluindo CLERK_SECRET_KEY', async () => {
+  it('faz parse das sete variáveis válidas, incluindo CLERK_SECRET_KEY e REVALIDATE_SECRET', async () => {
     process.env.NODE_ENV = 'test';
     process.env.DATABASE_URL = 'postgresql://uilib:uilib@localhost:5432/uilib?schema=public';
     process.env.WEB_ORIGIN = 'http://localhost:3000';
     process.env.PORT = '5000';
     process.env.LOG_LEVEL = 'warn';
     process.env.CLERK_SECRET_KEY = 'sk_test_secret';
+    process.env.REVALIDATE_SECRET = 'revalidate-secret';
 
     const { env } = await import('../env.js');
 
@@ -39,6 +40,7 @@ describe('config/env', () => {
       PORT: 5000,
       LOG_LEVEL: 'warn',
       CLERK_SECRET_KEY: 'sk_test_secret',
+      REVALIDATE_SECRET: 'revalidate-secret',
     });
   });
 
@@ -47,6 +49,7 @@ describe('config/env', () => {
     process.env.DATABASE_URL = 'postgresql://uilib:uilib@localhost:5432/uilib?schema=public';
     process.env.WEB_ORIGIN = 'http://localhost:3000';
     process.env.CLERK_SECRET_KEY = 'sk_test_secret';
+    process.env.REVALIDATE_SECRET = 'revalidate-secret';
     delete process.env.PORT;
     delete process.env.LOG_LEVEL;
 
@@ -60,6 +63,7 @@ describe('config/env', () => {
     process.env.NODE_ENV = 'test';
     process.env.DATABASE_URL = 'postgresql://uilib:uilib@localhost:5432/uilib?schema=public';
     process.env.WEB_ORIGIN = 'http://localhost:3000';
+    process.env.REVALIDATE_SECRET = 'revalidate-secret';
     delete process.env.CLERK_SECRET_KEY;
 
     await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
@@ -70,6 +74,17 @@ describe('config/env', () => {
     process.env.DATABASE_URL = 'postgresql://uilib:uilib@localhost:5432/uilib?schema=public';
     process.env.WEB_ORIGIN = 'http://localhost:3000';
     process.env.CLERK_SECRET_KEY = 'pk_test_wrong-prefix';
+    process.env.REVALIDATE_SECRET = 'revalidate-secret';
+
+    await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
+  });
+
+  it('falha ao iniciar se REVALIDATE_SECRET estiver ausente', async () => {
+    process.env.NODE_ENV = 'test';
+    process.env.DATABASE_URL = 'postgresql://uilib:uilib@localhost:5432/uilib?schema=public';
+    process.env.WEB_ORIGIN = 'http://localhost:3000';
+    process.env.CLERK_SECRET_KEY = 'sk_test_secret';
+    delete process.env.REVALIDATE_SECRET;
 
     await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
   });
@@ -79,6 +94,7 @@ describe('config/env', () => {
     process.env.DATABASE_URL = 'not-a-url';
     process.env.WEB_ORIGIN = 'http://localhost:3000';
     process.env.CLERK_SECRET_KEY = 'sk_test_secret';
+    process.env.REVALIDATE_SECRET = 'revalidate-secret';
 
     await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
   });
@@ -88,6 +104,7 @@ describe('config/env', () => {
     process.env.DATABASE_URL = 'postgresql://uilib:uilib@localhost:5432/uilib?schema=public';
     process.env.WEB_ORIGIN = 'http://localhost:3000';
     process.env.CLERK_SECRET_KEY = 'sk_test_secret';
+    process.env.REVALIDATE_SECRET = 'revalidate-secret';
 
     await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
   });

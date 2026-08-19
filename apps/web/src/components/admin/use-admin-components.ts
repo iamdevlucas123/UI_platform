@@ -37,3 +37,21 @@ export function useAdminComponents(): UseQueryResult<AdminComponentDto[], ApiErr
     retry: false,
   });
 }
+
+/** `GET /api/admin/components/:id` (seção 4/9 do MVP2) — carrega um componente pelo id para `/admin/components/[id]/edit`. Mesmo critério de token fresco por chamada de `useAdminComponents`. */
+export function useAdminComponent(id: string): UseQueryResult<AdminComponentDto, ApiError> {
+  const { getToken } = useAuth();
+
+  return useQuery({
+    queryKey: [...ADMIN_QUERY_KEY_PREFIX, 'components', id] as const,
+    queryFn: async () => {
+      const token = await getToken();
+      if (!token) {
+        throw new ApiError(401, 'UNAUTHORIZED', 'No active session');
+      }
+      const { data } = await adminApi.getComponent(id, token);
+      return data;
+    },
+    retry: false,
+  });
+}

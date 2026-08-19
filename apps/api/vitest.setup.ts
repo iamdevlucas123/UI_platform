@@ -14,3 +14,4 @@ process.env.WEB_ORIGIN ??= 'http://localhost:3000';
 process.env.PORT ??= '4000';
 process.env.LOG_LEVEL ??= 'error';
 process.env.CLERK_SECRET_KEY ??= 'sk_test_ci-secret-key';
+process.env.REVALIDATE_SECRET ??= 'test-revalidate-secret';

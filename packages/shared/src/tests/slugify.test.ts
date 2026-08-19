@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { slugify } from '../slug.js';
+import { slugify } from '../slugify.js';
 
 describe('slugify', () => {
   it('remove acentos e coloca em minúsculas', () => {

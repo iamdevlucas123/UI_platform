@@ -17,6 +17,9 @@ vi.mock('@clerk/backend', async () => ({
   verifyToken: vi.fn((await import('../support/clerk-mock.js')).mockVerifyToken),
 }));
 
+/** Mocka `revalidate()` (seção 7 do MVP2) — mesmo critério de `tests/integration/components.test.ts`. */
+vi.mock('../../src/lib/revalidate.js', () => ({ revalidate: vi.fn().mockResolvedValue(undefined) }));
+
 /**
  * Teste de integração de `GET /api/categories` (seção 7 e 13 do MVP1).
  * Requer um Postgres real acessível via `DATABASE_URL`, com as migrations

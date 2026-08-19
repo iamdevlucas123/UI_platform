@@ -6,4 +6,5 @@
 export * from './schemas/component.js';
 export * from './schemas/category.js';
 export * from './schemas/pagination.js';
+export * from './slugify.js';
 export * from './types.js';

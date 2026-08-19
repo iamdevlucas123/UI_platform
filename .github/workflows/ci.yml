@@ -32,6 +32,7 @@ jobs:
       PORT: '4000'
       LOG_LEVEL: error
       CLERK_SECRET_KEY: sk_test_ci-secret-key
+      REVALIDATE_SECRET: test-revalidate-secret
 
     steps:
       - uses: actions/checkout@v4

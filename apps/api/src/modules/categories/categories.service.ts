@@ -1,7 +1,7 @@
-import type { CreateCategoryInput, UpdateCategoryInput } from '@uilib/shared';
+import { slugify, type CreateCategoryInput, type UpdateCategoryInput } from '@uilib/shared';
 
 import { ConflictError, NotFoundError } from '../../lib/errors.js';
-import { slugify } from '../../lib/slug.js';
+import { revalidate } from '../../lib/revalidate.js';
 import {
   countComponentsByCategoryId,
   createCategoryRecord,
@@ -62,6 +62,8 @@ export async function createCategory(input: CreateCategoryInput): Promise<Catego
     position: input.position,
   });
 
+  await revalidate();
+
   return toCategoryDto(row);
 }
 
@@ -92,6 +94,9 @@ export async function updateCategory(
   }
 
   const row = await updateCategoryRecord(id, { ...input, slug });
+
+  await revalidate();
+
   return toCategoryDto(row);
 }
 
@@ -115,4 +120,6 @@ export async function deleteCategory(id: string): Promise<void> {
   }
 
   await deleteCategoryRecord(id);
+
+  await revalidate();
 }
