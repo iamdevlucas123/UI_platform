@@ -13,4 +13,4 @@ process.env.DATABASE_URL ??= 'postgresql://uilib:uilib@localhost:5433/uilib_test
 process.env.WEB_ORIGIN ??= 'http://localhost:3000';
 process.env.PORT ??= '4000';
 process.env.LOG_LEVEL ??= 'error';
-process.env.DEV_ADMIN_TOKEN ??= 'test-admin-token';
+process.env.CLERK_SECRET_KEY ??= 'sk_test_ci-secret-key';

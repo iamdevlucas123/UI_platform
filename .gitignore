@@ -27,7 +27,7 @@ pnpm-debug.log*
 !.vscode/extensions.json
 .idea/
 
-/docs
+docs/
 prompts.md
 note.txt
 MVP1.md

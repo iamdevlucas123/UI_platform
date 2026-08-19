@@ -43,7 +43,7 @@ Variáveis usadas nesta etapa (ver `.env.example`):
 | `PORT` | Porta HTTP da API |
 | `WEB_ORIGIN` | Origem permitida no CORS |
 | `LOG_LEVEL` | Nível de log do Pino |
-| `DEV_ADMIN_TOKEN` | Token provisório para autenticar rotas `/api/admin/*` (substituído pelo Clerk no MVP2) |
+| `CLERK_SECRET_KEY` | Secret key do Clerk, usada por `verifyToken` para autenticar rotas `/api/admin/*` (seção 9 do MVP2) |
 
 ## Executando a API
 

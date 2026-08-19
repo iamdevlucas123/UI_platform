@@ -7,7 +7,13 @@ WORKDIR /app
 FROM base AS deps
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY apps/api/package.json apps/api/
+COPY apps/api/prisma apps/api/prisma
 COPY packages/shared/package.json packages/shared/
+# O schema precisa estar presente antes do install porque o "postinstall"
+# de @uilib/api roda "prisma generate", que falha sem prisma/schema.prisma —
+# só os package.json são copiados nesta etapa (cache de layer), mas o
+# schema muda raramente, então copiá-lo aqui não invalida o cache com a
+# mesma frequência que o restante do código-fonte (copiado só no estágio "dev").
 RUN pnpm install --frozen-lockfile
 
 FROM deps AS dev

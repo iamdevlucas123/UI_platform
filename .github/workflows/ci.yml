@@ -31,7 +31,7 @@ jobs:
       WEB_ORIGIN: http://localhost:3000
       PORT: '4000'
       LOG_LEVEL: error
-      DEV_ADMIN_TOKEN: ci-admin-token
+      CLERK_SECRET_KEY: sk_test_ci-secret-key
 
     steps:
       - uses: actions/checkout@v4

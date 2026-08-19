@@ -2,8 +2,20 @@ import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../src/app.js';
-import { env } from '../../src/config/env.js';
 import { prisma } from '../../src/lib/prisma.js';
+import { ADMIN_BEARER_TOKEN } from '../support/clerk-mock.js';
+
+/**
+ * Mocka `verifyToken` (`@clerk/backend`) — mesmo critério de
+ * `tests/integration/components.test.ts`: os testes de `/api/admin/categories`
+ * abaixo autenticam com `ADMIN_BEARER_TOKEN`, sem depender de rede real do
+ * Clerk (seção 9 do MVP2, seção 13 do MVP1). O `import()` dinâmico dentro do
+ * factory é necessário porque `vi.mock` é hoisted para o topo do arquivo,
+ * antes de imports estáticos normais serem inicializados.
+ */
+vi.mock('@clerk/backend', async () => ({
+  verifyToken: vi.fn((await import('../support/clerk-mock.js')).mockVerifyToken),
+}));
 
 /**
  * Teste de integração de `GET /api/categories` (seção 7 e 13 do MVP1).
@@ -123,7 +135,7 @@ describe('GET /api/categories', () => {
  * (seção 7 e 13 do MVP1), protegidos pelo middleware provisório (seção 9).
  */
 describe('/api/admin/categories', () => {
-  const adminHeader = () => ['Authorization', `Bearer ${env.DEV_ADMIN_TOKEN}`] as const;
+  const adminHeader = () => ['Authorization', `Bearer ${ADMIN_BEARER_TOKEN}`] as const;
 
   beforeEach(async () => {
     await prisma.$executeRawUnsafe(

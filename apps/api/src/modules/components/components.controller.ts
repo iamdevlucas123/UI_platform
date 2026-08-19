@@ -48,7 +48,7 @@ export const getComponentBySlug: RequestHandler<{ slug: string }> = async (
   res,
 ): Promise<void> => {
   const preview = req.query.preview === '1';
-  const isAdmin = Boolean(getAdminAuthContext(req));
+  const isAdmin = Boolean(await getAdminAuthContext(req));
 
   const component = await getPublishedComponent(req.params.slug, { preview, isAdmin });
 

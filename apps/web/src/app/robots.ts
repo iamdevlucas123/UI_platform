@@ -4,12 +4,10 @@ import { publicEnv } from '@/lib/env';
 
 /**
  * `robots.txt` (seção 7 do MVP2): libera só a área pública. `/admin` e
- * `/sign-in` ficam fora do índice mesmo antes de existirem no app — a rota
- * (`/admin(.*)` do `clerkMiddleware`, seção 9) já reserva esses prefixos, e
- * um `Disallow` antecipado é inofensivo. Quando `/admin/*` existir, cada
- * página lá também deve emitir `robots: {index:false}` na própria
- * `generateMetadata`/`metadata` — este arquivo cobre o crawler no nível do
- * site, não substitui isso.
+ * `/sign-in` ficam fora do índice a nível de crawler; cada página de
+ * `/admin/*` também emite `robots: {index:false}` na própria metadata
+ * (`app/admin/layout.tsx`, seção 9) — este arquivo é defesa em
+ * profundidade, não a única camada.
  */
 export default function robots(): MetadataRoute.Robots {
   return {

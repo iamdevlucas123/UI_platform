@@ -1,9 +1,12 @@
 import { z } from 'zod';
 
 /**
- * Schema das seis variáveis de ambiente desta etapa (MVP1, seção 12).
- * `DEV_ADMIN_TOKEN` é a auth provisória (seção 9) — qualquer string não
- * vazia serve em dev; é substituída pelo Clerk no MVP2.
+ * Schema das variáveis de ambiente da aplicação. `DEV_ADMIN_TOKEN` (auth
+ * provisória do MVP1, seção 9) foi removida nesta etapa: `CLERK_SECRET_KEY`
+ * é quem autentica `/api/admin/*` agora, via `verifyToken` (`@clerk/backend`)
+ * em `middlewares/require-admin.ts`. `WEB_ORIGIN` já existia (CORS) e passa
+ * a ser reaproveitada como `authorizedParties` na verificação do token —
+ * mesmo critério do `NEXT_PUBLIC_SITE_URL` no frontend.
  */
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']),
@@ -11,7 +14,7 @@ const envSchema = z.object({
   WEB_ORIGIN: z.url(),
   PORT: z.coerce.number().default(4000),
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),
-  DEV_ADMIN_TOKEN: z.string().min(1),
+  CLERK_SECRET_KEY: z.string().min(1).startsWith('sk_'),
 });
 
 const parsed = envSchema.safeParse(process.env);

@@ -3,8 +3,18 @@ import request from 'supertest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { app } from '../../src/app.js';
-import { env } from '../../src/config/env.js';
 import { prisma } from '../../src/lib/prisma.js';
+import { ADMIN_BEARER_TOKEN, NON_ADMIN_BEARER_TOKEN } from '../support/clerk-mock.js';
+
+/**
+ * Mocka `verifyToken` (`@clerk/backend`) para todo este arquivo — os testes
+ * de `/api/admin/*` abaixo autenticam com `ADMIN_BEARER_TOKEN`/
+ * `NON_ADMIN_BEARER_TOKEN` (seção 13 do MVP1: integração sem depender de
+ * rede real do Clerk).
+ */
+vi.mock('@clerk/backend', async () => ({
+  verifyToken: vi.fn((await import('../support/clerk-mock.js')).mockVerifyToken),
+}));
 
 /**
  * Testes de integração de `GET /api/components` e `GET /api/components/:slug`
@@ -381,7 +391,7 @@ describe('components', () => {
 
       const response = await request(app)
         .get('/api/components/draft-toggle?preview=1')
-        .set('Authorization', `Bearer ${env.DEV_ADMIN_TOKEN}`);
+        .set('Authorization', `Bearer ${ADMIN_BEARER_TOKEN}`);
 
       expect(response.status).toBe(200);
       expect(response.body.data.slug).toBe('draft-toggle');
@@ -508,7 +518,7 @@ describe('components', () => {
 
       const response = await request(app)
         .get('/api/components/draft-toggle/prompt')
-        .set('Authorization', `Bearer ${env.DEV_ADMIN_TOKEN}`);
+        .set('Authorization', `Bearer ${ADMIN_BEARER_TOKEN}`);
 
       expect(response.status).toBe(404);
     });
@@ -524,7 +534,7 @@ describe('components', () => {
   });
 
   describe('/api/admin/components', () => {
-    const adminHeader = () => ['Authorization', `Bearer ${env.DEV_ADMIN_TOKEN}`] as const;
+    const adminHeader = () => ['Authorization', `Bearer ${ADMIN_BEARER_TOKEN}`] as const;
 
     const validBody = () => ({
       name: 'Neon Toggle Switch',
@@ -546,8 +556,25 @@ describe('components', () => {
         .send(validBody());
 
       expect(noToken.status).toBe(401);
+      expect(noToken.body.error.code).toBe('UNAUTHORIZED');
       expect(invalidToken.status).toBe(401);
       expect(postWithoutToken.status).toBe(401);
+    });
+
+    it('retorna 403 quando o token é válido mas sem role admin (seção 9 do MVP2)', async () => {
+      const response = await request(app)
+        .get('/api/admin/components')
+        .set('Authorization', `Bearer ${NON_ADMIN_BEARER_TOKEN}`);
+
+      expect(response.status).toBe(403);
+      expect(response.body.error.code).toBe('FORBIDDEN');
+    });
+
+    it('retorna 200 quando o token é válido e tem claims de role admin', async () => {
+      const response = await request(app).get('/api/admin/components').set(...adminHeader());
+
+      expect(response.status).toBe(200);
+      expect(response.body.data).toEqual([]);
     });
 
     describe('GET /api/admin/components', () => {
@@ -606,7 +633,7 @@ describe('components', () => {
         expect(response.body.data.publishedAt).toBeNull();
         expect(response.body.data.authorId).toEqual(expect.any(String));
 
-        const author = await prisma.user.findUnique({ where: { clerkId: 'dev-admin' } });
+        const author = await prisma.user.findUnique({ where: { clerkId: 'user_test_admin' } });
         expect(author?.email).toBe('admin@dev.local');
         expect(response.body.data.authorId).toBe(author?.id);
       });

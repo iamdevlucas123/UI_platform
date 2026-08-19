@@ -22,13 +22,13 @@ describe('config/env', () => {
     vi.restoreAllMocks();
   });
 
-  it('faz parse das seis variáveis válidas, incluindo DEV_ADMIN_TOKEN', async () => {
+  it('faz parse das seis variáveis válidas, incluindo CLERK_SECRET_KEY', async () => {
     process.env.NODE_ENV = 'test';
     process.env.DATABASE_URL = 'postgresql://uilib:uilib@localhost:5432/uilib?schema=public';
     process.env.WEB_ORIGIN = 'http://localhost:3000';
     process.env.PORT = '5000';
     process.env.LOG_LEVEL = 'warn';
-    process.env.DEV_ADMIN_TOKEN = 'dev-token';
+    process.env.CLERK_SECRET_KEY = 'sk_test_secret';
 
     const { env } = await import('../env.js');
 
@@ -38,7 +38,7 @@ describe('config/env', () => {
       WEB_ORIGIN: 'http://localhost:3000',
       PORT: 5000,
       LOG_LEVEL: 'warn',
-      DEV_ADMIN_TOKEN: 'dev-token',
+      CLERK_SECRET_KEY: 'sk_test_secret',
     });
   });
 
@@ -46,7 +46,7 @@ describe('config/env', () => {
     process.env.NODE_ENV = 'test';
     process.env.DATABASE_URL = 'postgresql://uilib:uilib@localhost:5432/uilib?schema=public';
     process.env.WEB_ORIGIN = 'http://localhost:3000';
-    process.env.DEV_ADMIN_TOKEN = 'dev-token';
+    process.env.CLERK_SECRET_KEY = 'sk_test_secret';
     delete process.env.PORT;
     delete process.env.LOG_LEVEL;
 
@@ -56,11 +56,20 @@ describe('config/env', () => {
     expect(env.LOG_LEVEL).toBe('info');
   });
 
-  it('falha ao iniciar se DEV_ADMIN_TOKEN estiver ausente', async () => {
+  it('falha ao iniciar se CLERK_SECRET_KEY estiver ausente', async () => {
     process.env.NODE_ENV = 'test';
     process.env.DATABASE_URL = 'postgresql://uilib:uilib@localhost:5432/uilib?schema=public';
     process.env.WEB_ORIGIN = 'http://localhost:3000';
-    delete process.env.DEV_ADMIN_TOKEN;
+    delete process.env.CLERK_SECRET_KEY;
+
+    await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
+  });
+
+  it('falha ao iniciar se CLERK_SECRET_KEY não começar com "sk_"', async () => {
+    process.env.NODE_ENV = 'test';
+    process.env.DATABASE_URL = 'postgresql://uilib:uilib@localhost:5432/uilib?schema=public';
+    process.env.WEB_ORIGIN = 'http://localhost:3000';
+    process.env.CLERK_SECRET_KEY = 'pk_test_wrong-prefix';
 
     await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
   });
@@ -69,7 +78,7 @@ describe('config/env', () => {
     process.env.NODE_ENV = 'test';
     process.env.DATABASE_URL = 'not-a-url';
     process.env.WEB_ORIGIN = 'http://localhost:3000';
-    process.env.DEV_ADMIN_TOKEN = 'dev-token';
+    process.env.CLERK_SECRET_KEY = 'sk_test_secret';
 
     await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
   });
@@ -78,7 +87,7 @@ describe('config/env', () => {
     process.env.NODE_ENV = 'staging';
     process.env.DATABASE_URL = 'postgresql://uilib:uilib@localhost:5432/uilib?schema=public';
     process.env.WEB_ORIGIN = 'http://localhost:3000';
-    process.env.DEV_ADMIN_TOKEN = 'dev-token';
+    process.env.CLERK_SECRET_KEY = 'sk_test_secret';
 
     await expect(import('../env.js')).rejects.toThrow('Invalid environment variables');
   });
