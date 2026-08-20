@@ -60,7 +60,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       afterSignOutUrl="/"
     >
       <html lang="en">
-        <body className="min-h-screen bg-white text-neutral-950 antialiased">{children}</body>
+        {/* suppressHydrationWarning: só ignora divergências de atributos deste
+            elemento — cobre extensões de navegador (ex.: ColorZilla injeta
+            `cz-shortcut-listen` no <body> antes do React hidratar), nunca a
+            árvore inteira. */}
+        <body
+          className="min-h-screen bg-white text-neutral-950 antialiased"
+          suppressHydrationWarning
+        >
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   );
