@@ -1,23 +1,26 @@
 # apps/web
 
 Frontend Next.js 15 (App Router) da biblioteca de componentes — ver
-`docs/MVP2.md`. Nesta etapa: a home pública (`/`, seção 5.1) e a
-infraestrutura de preview sandboxed (seção 8) estão implementadas. A
-página de detalhe (`/component/[slug]`) e a área administrativa ainda não
-existem.
+`docs/MVP2.md` (não versionado; ver README raiz para o resumo do produto).
+Implementado nesta etapa: catálogo público (home, busca, categoria,
+detalhe com preview sandboxed e cópia de código/prompt), área
+administrativa (`/admin`, CRUD de componentes e categorias) protegida por
+Clerk, revalidação de cache sob demanda e CSP restritiva.
 
 ## Rodando localmente
 
 ```bash
 pnpm install                      # na raiz do monorepo
-cp .env.example .env              # se ainda não existir
+cp .env.example .env              # na raiz — se ainda não existir
 pnpm --filter @uilib/web dev
 ```
 
-O servidor sobe em `http://localhost:3000`. A home (`/`) precisa da API
-(`apps/api`, seção 4) rodando e acessível em `INTERNAL_API_URL` — sem ela,
-a home continua carregando (não quebra) e mostra o estado de erro
-recuperável com um botão "Try again".
+O servidor sobe em `http://localhost:3000`. As páginas públicas precisam
+da API (`apps/api`) rodando e acessível em `INTERNAL_API_URL` — sem ela,
+elas continuam carregando (não quebram) e mostram um estado de erro
+recuperável com um botão "Try again". A área `/admin` precisa, além
+disso, de chaves reais do Clerk (ver README raiz, seção "Configurando o
+Clerk") para autenticar de verdade.
 
 **`pnpm --filter @uilib/web start` não funciona** com `output: 'standalone'`
 (o próprio Next.js avisa isso e serve conteúdo incorreto/desatualizado em
@@ -35,8 +38,7 @@ imagem — isso só é necessário para testar o standalone manualmente.
 ## Variáveis de ambiente
 
 Validadas em `src/lib/env.ts` (Zod). Ver `.env.example` na raiz do
-monorepo, seção "Clerk (MVP2)" / "Web (MVP2)" / "Revalidação de cache
-(MVP2)":
+monorepo:
 
 | Variável | Onde é usada | Descrição |
 |---|---|---|
@@ -47,7 +49,7 @@ monorepo, seção "Clerk (MVP2)" / "Web (MVP2)" / "Revalidação de cache
 | `NEXT_PUBLIC_SITE_URL` | cliente + servidor | URL pública do site (usada em metadata/SEO) |
 | `CLERK_SECRET_KEY` | **apenas servidor** | Nunca é embutida no bundle do cliente |
 | `INTERNAL_API_URL` | **apenas servidor** | URL da API na rede interna do Docker |
-| `REVALIDATE_SECRET` | **apenas servidor** | Segredo compartilhado com `apps/api` para `revalidateTag` |
+| `REVALIDATE_SECRET` | **apenas servidor** | Segredo compartilhado com `apps/api` para `POST /api/revalidate` |
 
 `CLERK_SECRET_KEY` e `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` exigem uma
 aplicação real criada no dashboard do Clerk — os valores de exemplo em
@@ -61,34 +63,43 @@ pnpm --filter @uilib/web dev         # servidor de desenvolvimento
 pnpm --filter @uilib/web build       # build de produção (output: 'standalone')
 pnpm --filter @uilib/web lint        # ESLint
 pnpm --filter @uilib/web typecheck   # tsc --noEmit
-pnpm --filter @uilib/web test        # Vitest
+pnpm --filter @uilib/web test        # Vitest + Testing Library
 ```
+
+Testes end-to-end (Playwright) vivem em `apps/e2e`, num workspace à parte
+— ver `apps/e2e/README.md`.
 
 ## Estrutura
 
 ```
 src/
+├── middleware.ts                 # clerkMiddleware (auth) + CSP por request (seção 9/11)
 ├── app/
-│   ├── layout.tsx              # layout raiz — Tailwind + metadata base
-│   ├── page.tsx                 # home pública (seção 5.1) — Server Component, dinâmica
-│   ├── loading.tsx              # skeleton da home (Suspense fallback)
-│   ├── error.tsx                # rede de segurança para falhas inesperadas
-│   ├── globals.css              # @import "tailwindcss"
-│   └── dev/preview/              # rota de dev, noindex + bloqueada em produção —
-│                                  # valida SandboxPreview/LazyPreview isoladamente
+│   ├── layout.tsx                 # layout raiz — Tailwind + metadata base
+│   ├── page.tsx                   # home pública (seção 5.1) — Server Component, dinâmica
+│   ├── category/[slug]/           # catálogo filtrado por categoria (ISR)
+│   ├── component/[slug]/          # detalhe: preview, abas de código, copy code/prompt, OG image
+│   ├── sign-in/[[...sign-in]]/    # login Clerk
+│   ├── admin/                     # área administrativa — ver abaixo
+│   │   ├── layout.tsx              # guard de autorização (role === 'admin')
+│   │   ├── page.tsx                # dashboard (contagem por status/categoria)
+│   │   ├── components/             # listagem, criação e edição de componentes
+│   │   └── categories/             # CRUD de categorias (num único page, com diálogos)
+│   ├── api/revalidate/route.ts    # endpoint interno chamado pela API após mutações (seção 7)
+│   ├── sitemap.ts / robots.ts     # SEO técnico
+│   └── dev/preview/                # rota de dev, bloqueada em produção — playground de preview
 ├── components/
-│   ├── ui/                       # reservado para o subset shadcn/ui (seção 3 do MVP2)
-│   ├── preview/                  # SandboxPreview, LazyPreview, ThemeToggle (seção 8)
-│   └── catalog/                  # ComponentCard, Grid, SearchBar, CategoryNav,
-│                                  # SortToggle, Pagination, CatalogGrid, EmptyState (seção 5.1)
+│   ├── ui/                        # subset shadcn/ui (Button, Input, Select, Dialog, Toast…)
+│   ├── preview/                   # SandboxPreview, LazyPreview, ThemeToggle (seção 8)
+│   ├── code/                      # CodeTabs, CodeBlockView (Shiki), CopyCodeButton
+│   ├── prompt/                    # PromptPanel, CopyPromptButton, StackSelector
+│   ├── catalog/                   # ComponentCard, Grid, SearchBar, CategoryNav, Pagination…
+│   └── admin/                     # ComponentForm, CategoryForm, DataTable, hooks de TanStack Query
 └── lib/
-    ├── env.ts                    # validação de ambiente com Zod (seção 13)
-    ├── api-client.ts             # camada única de comunicação com a API (seção 4/10)
-    ├── build-srcdoc.ts           # monta o documento do iframe de preview (seção 8)
-    └── catalog-url.ts            # parsing/construção de URL canônica da home (seção 5.1)
+    ├── env.ts                     # validação de ambiente com Zod (seção 13)
+    ├── api-client.ts              # camada única de comunicação com a API (seção 4/10)
+    ├── csp.ts                     # Content-Security-Policy do site (seção 11)
+    ├── build-srcdoc.ts            # monta o documento do iframe de preview (seção 8)
+    ├── copy-to-clipboard.ts       # Copy Code / Copy AI Prompt (seção 5.2/5.3)
+    └── catalog-url.ts             # parsing/construção de URL canônica do catálogo
 ```
-
-As demais pastas descritas na seção 7 do `docs/MVP2.md`
-(`components/code`, `components/prompt`, `components/admin`,
-`middleware.ts`, `/component/[slug]`, rotas de admin) ainda não existem —
-serão adicionadas junto com as funcionalidades que as usam.

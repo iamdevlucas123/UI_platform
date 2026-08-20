@@ -33,6 +33,8 @@ export default clerkMiddleware(async (auth, req) => {
     nonce,
     clerkFrontendApiOrigin: CLERK_ORIGIN,
     apiOrigin: API_ORIGIN,
+    // `next dev` precisa de `unsafe-eval` (ver `lib/csp.ts`) — nunca em produção.
+    allowUnsafeEval: process.env.NODE_ENV !== 'production',
   });
 
   const requestHeaders = new Headers(req.headers);

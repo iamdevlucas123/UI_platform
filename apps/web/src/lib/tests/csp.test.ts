@@ -22,6 +22,7 @@ describe('buildContentSecurityPolicy (seção 11 do MVP2)', () => {
     nonce: 'test-nonce',
     clerkFrontendApiOrigin: 'https://vast-elf-9900.clerk.accounts.dev',
     apiOrigin: 'http://localhost:4000',
+    allowUnsafeEval: false,
   };
 
   it('inclui exatamente as diretivas da seção 11: default-src, frame-src e img-src', () => {
@@ -30,6 +31,18 @@ describe('buildContentSecurityPolicy (seção 11 do MVP2)', () => {
     expect(csp).toContain("default-src 'self'");
     expect(csp).toContain("frame-src 'self' data:");
     expect(csp).toContain("img-src 'self' data: https:");
+  });
+
+  it('libera style-src para o highlight de código do Shiki (CodeBlockView usa style inline, não dangerouslySetInnerHTML)', () => {
+    const csp = buildContentSecurityPolicy(BASE_INPUT);
+
+    expect(csp).toContain("style-src 'self' 'unsafe-inline'");
+  });
+
+  it('libera worker-src para o Web Worker que o SDK do Clerk cria a partir de uma blob: URL', () => {
+    const csp = buildContentSecurityPolicy(BASE_INPUT);
+
+    expect(csp).toContain("worker-src 'self' blob:");
   });
 
   it('libera só o domínio do Clerk (e o nonce) em script-src — nenhum outro host', () => {
@@ -42,6 +55,25 @@ describe('buildContentSecurityPolicy (seção 11 do MVP2)', () => {
     expect(scriptSrc).toBe(
       "script-src 'self' 'nonce-test-nonce' https://vast-elf-9900.clerk.accounts.dev",
     );
+  });
+
+  it('nunca inclui unsafe-eval quando allowUnsafeEval é false (produção)', () => {
+    const csp = buildContentSecurityPolicy({ ...BASE_INPUT, allowUnsafeEval: false });
+
+    expect(csp).not.toContain('unsafe-eval');
+  });
+
+  it('inclui unsafe-eval só em script-src quando allowUnsafeEval é true (next dev — ver comentário em csp.ts)', () => {
+    const csp = buildContentSecurityPolicy({ ...BASE_INPUT, allowUnsafeEval: true });
+    const scriptSrc = csp
+      .split(';')
+      .map((directive) => directive.trim())
+      .find((directive) => directive.startsWith('script-src'));
+
+    expect(scriptSrc).toBe(
+      "script-src 'self' 'nonce-test-nonce' https://vast-elf-9900.clerk.accounts.dev 'unsafe-eval'",
+    );
+    expect(csp).not.toMatch(/connect-src[^;]*unsafe-eval/);
   });
 
   it('libera o domínio do Clerk e a origem da API (seção 10: fetch direto do browser) em connect-src', () => {
