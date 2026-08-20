@@ -1,5 +1,5 @@
-# Ambiente de desenvolvimento (MVP1, seção 11) — sobe banco + API com
-# `docker compose up`. O serviço `web` é adicionado neste arquivo no MVP2.
+# Ambiente de desenvolvimento (MVP1, seção 11; serviço `web` adicionado no
+# MVP2, seção 12) — sobe banco + API + web com `docker compose up`.
 services:
   db:
     image: postgres:16-alpine
@@ -50,6 +50,45 @@ services:
     # só existe em apps/api/node_modules/.bin — `pnpm prisma` na raiz do
     # monorepo não resolveria o comando.
     command: sh -c "pnpm --filter @uilib/shared build && pnpm --filter @uilib/api prisma:deploy && pnpm --filter @uilib/api prisma:seed && pnpm --filter @uilib/api dev"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      target: dev
+    container_name: uilib_web
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # `PORT=4000` do `.env` raiz é para o serviço `api` — sem sobrescrever
+      # aqui, `next dev` herdaria esse valor via `env_file` e tentaria
+      # escutar em 4000 dentro do container, deixando o mapeamento
+      # `'3000:3000'` abaixo sem nada ouvindo do outro lado (confirmado
+      # rodando `docker compose up web` sem este override: `next dev` subia
+      # em `http://localhost:4000` *dentro* do container e a porta 3000
+      # publicada ficava morta).
+      PORT: '3000'
+      # Duas URLs de API distintas (seção 10/12 do MVP2): o browser fala com
+      # a API pelo host publicado (`localhost:4000`), o servidor do Next
+      # (SSR/Server Components) fala pela rede interna do Docker
+      # (`http://api:4000`) — confundir as duas é a causa mais comum de
+      # "funciona no client mas quebra no SSR" (seção 12).
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      INTERNAL_API_URL: http://api:4000
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./apps/web:/app/apps/web
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/web/node_modules
+    depends_on:
+      - api
+    # Mesmo motivo do `command` do serviço `api` acima: o bind mount
+    # `./packages:/app/packages` sobrepõe o `dist/` de `@uilib/shared`
+    # gerado durante o build da imagem, então precisa ser (re)compilado
+    # aqui para o `dev` funcionar com um único `docker compose up`.
+    command: sh -c "pnpm --filter @uilib/shared build && pnpm --filter @uilib/web dev"
 
 volumes:
   pgdata:

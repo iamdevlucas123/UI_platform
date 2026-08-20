@@ -8,14 +8,10 @@ import { cn } from '@/lib/cn';
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard' },
   { href: '/admin/components', label: 'Components' },
+  { href: '/admin/categories', label: 'Categories' },
 ];
 
-/**
- * Navegação da área administrativa (seção 7 do MVP2). Só linka para rotas
- * que já existem nesta etapa — `/admin/categories` (CRUD de categorias,
- * seção 5.4) fica para uma tarefa futura; adicioná-la aqui hoje só criaria
- * um link morto.
- */
+/** Navegação da área administrativa (seção 7 do MVP2). */
 export function AdminNav() {
   const pathname = usePathname();
 
